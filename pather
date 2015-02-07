@@ -1,0 +1,117 @@
+#!/usr/bin/php
+<?php  // not necessary, I just don't want the code to show up in the shell
+
+/**
+ *  Notes: 
+ *
+ * I'm not too much for putting php into a bash script, but I didn't want to deviate from the instructions in any way.
+ *
+ * There is no point ordering listed in the spec, so I just used an ordering that generates the expected outcome
+ *
+ * the xy coordinate convention is inverted in this code, as it is easier to keep xy straight in my head, even if the actual map is yx
+ *
+ * the program with overwrite an existing output file
+ *
+ */
+
+define('POINT_CHAR', "#");
+define('PATH_CHAR', "*");
+
+
+/**
+ *  Helper functions
+ *
+ */
+
+// get the files and verify that the input exists:
+$fileName_in = $argv[1];
+$fileName_out = $argv[2];
+
+if (!file_exists ($fileName_in)) {
+    echo "bad input file: $fileName_in";
+    die();
+}
+
+// load the file into an array:
+$map = fileToArray($fileName_in);
+
+// find the points:
+$points = findPoints($map);
+
+// draw paths between each point:
+for($pathIndex = 1; $pathIndex < count($points); $pathIndex++ ) {
+    $map = drawPathBetweenPoints($points[$pathIndex - 1], $points[$pathIndex], $map);
+}
+
+// output the array as a file:
+arrayToFile($fileName_out, $map);
+
+// end //
+
+/**
+ *  Helper functions
+ *
+ */
+
+function fileToArray($fileName_in) {
+
+    $output = array();
+    $fh = fopen($fileName_in, "r");
+
+    while (!feof($fh)) {
+        $line = fgets($fh);
+        $output[] = str_split($line);
+    }    
+
+    fclose($fh);
+
+    return $output;
+
+}
+
+function arrayToFile($fileName_out, $map) {
+
+    $fh = fopen($fileName_out, "w");
+
+    foreach ($map as $line) {
+        fputs($fh, implode("", $line));
+    }
+
+    fclose($fh);
+}
+
+function findPoints ($map) {
+    $out = array();
+
+    foreach ($map as $x => $line) {
+        foreach($line as $y => $element) {
+            if ($element == POINT_CHAR) {
+                $out[] = array("x" => $x, "y" => $y);
+            }
+        }
+    }
+    return $out;
+}
+
+function drawPathBetweenPoints($start, $end, $map) {
+
+    // draw the vert:
+    $y = $start['y'];
+    for ($x = min($start['x'], $end['x']) + 1; $x <= max($start['x'], $end['x']); $x++) {
+        $map[$x][$y] = PATH_CHAR;
+    }
+
+    // draw the horz:
+    $x--;
+    for ($y = min($start['y'], $end['y']) + 1; $y < max($start['y'], $end['y']); $y++) {
+        $map[$x][$y] = PATH_CHAR;
+    }
+
+    return $map;
+}
+
+function printArray ($arr) {
+    foreach ($arr as $line) {
+        echo implode("", $line);
+    }
+}
