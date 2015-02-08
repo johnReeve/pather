@@ -9,18 +9,21 @@
  * I think that there are a lot of good approaches to the problem, but stuck to a simple procedural style due
  * to the brevity of the problem.
  *
- * There is no point ordering listed in the spec, so I just used an ordering that generates the expected outcome.  It
- * would be possible to generate a different path set if you, say, reversed or randomize the order of the points.
+ * The points have no ordering rules listed in the spec, so I just used an ordering that generates the expected outcome 
+ * (that is, parses them left to right, top to bottom).  It would be possible to generate a different path set if 
+ * you, say, reversed or randomize the order of the points.
  *
  * There is no validation for the map: the program assumes all lines are equal length.  As such, the program breaks if
- * the lines are unequal length.  We could either invalidate the map or write code that expands the map (given the nature
- * of arrays in PHP all we'd do is to make sure that the path drawing coe pushes newline characters to the end of a line's array).
+ * the lines are unequal length.  We could either invalidate the map and thorw an error,  or we could write code that 
+ * expands the map areas not listed in input file (given the nature of arrays in PHP all we'd do is to make sure that 
+ * the path drawing code pushes newline characters to the end of a line's array).
  *
- * the xy coordinate convention is inverted in this code, as it is easier to keep xy straight in my head, even if the actual map is yx
+ * The xy coordinate convention is inverted in this code, as it is easier to keep xy straight in my head, even if 
+ * the actual map is yx graphically.
  *
- * the program with overwrite an existing output file
+ * The program will overwrite an existing output file
  *
- * I don't do any error handling with the file write at all
+ * I don't do any error handling with the file write at all, or much error checking at all.
  *
  *  Adding some way of easily expanding the test runner in path-problem.sh would be an easy thing to do and simplify adding test cases.
  *
