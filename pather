@@ -2,31 +2,46 @@
 <?php  // not necessary, I just don't want the code to show up in the shell
 
 /**
- *  Notes: 
+ *  Notes:
  *
  * I'm not too much for putting php into a bash script, but I didn't want to deviate from the instructions in any way.
  *
- * There is no point ordering listed in the spec, so I just used an ordering that generates the expected outcome
+ * I think that there are a lot of good approaches to the problem, but stuck to a simple procedural style due
+ * to the brevity of the problem.
+ *
+ * There is no point ordering listed in the spec, so I just used an ordering that generates the expected outcome.  It
+ * would be possible to generate a different path set if you, say, reversed or randomize the order of the points.
+ *
+ * There is no validation for the map: the program assumes all lines are equal length.  As such, the program breaks if
+ * the lines are unequal length.  We could either invalidate the map or write code that expands the map (given the nature
+ * of arrays in PHP all we'd do is to make sure that the path drawing coe pushes newline characters to the end of a line's array).
  *
  * the xy coordinate convention is inverted in this code, as it is easier to keep xy straight in my head, even if the actual map is yx
  *
  * the program with overwrite an existing output file
+ *
+ * I don't do any error handling with the file write at all
+ *
+ *  Adding some way of easily expanding the test runner in path-problem.sh would be an easy thing to do and simplify adding test cases.
+ *
+ */
+
+/**
+ *  Environment
  *
  */
 
 define('POINT_CHAR', "#");
 define('PATH_CHAR', "*");
 
-
 /**
- *  Helper functions
+ *  Program Logic
  *
  */
 
 // get the files and verify that the input exists:
 $fileName_in = $argv[1];
 $fileName_out = $argv[2];
-
 if (!file_exists ($fileName_in)) {
     echo "bad input file: $fileName_in";
     die();
@@ -45,6 +60,7 @@ for($pathIndex = 1; $pathIndex < count($points); $pathIndex++ ) {
 
 // output the array as a file:
 arrayToFile($fileName_out, $map);
+die();
 
 // end //
 
@@ -53,6 +69,12 @@ arrayToFile($fileName_out, $map);
  *
  */
 
+/**
+ * read a file's cahracters into a 2d array
+ * @param $fileName_in
+ *
+ * @return array
+ */
 function fileToArray($fileName_in) {
 
     $output = array();
@@ -61,7 +83,7 @@ function fileToArray($fileName_in) {
     while (!feof($fh)) {
         $line = fgets($fh);
         $output[] = str_split($line);
-    }    
+    }
 
     fclose($fh);
 
@@ -69,6 +91,14 @@ function fileToArray($fileName_in) {
 
 }
 
+/**
+ * writes a 2d map array to a file.
+ * @param $fileName_out = the output of the file name
+ * @param $map
+ *
+ * no error checking
+ *
+ */
 function arrayToFile($fileName_out, $map) {
 
     $fh = fopen($fileName_out, "w");
@@ -80,6 +110,13 @@ function arrayToFile($fileName_out, $map) {
     fclose($fh);
 }
 
+/**
+ * searches left to right and top to bottom to generate a list of points on the map array
+ *
+ * @param $map - the 2d map array
+ *
+ * @return array - a list of arrays with x and y indexes for each point
+ */
 function findPoints ($map) {
     $out = array();
 
@@ -93,6 +130,14 @@ function findPoints ($map) {
     return $out;
 }
 
+/**
+ * draws a path on the map array
+ * @param $start - starting point consisting of an array with keys for x and y
+ * @param $end - ending point consisting of an array with keys for x and y
+ * @param $map - the 2d map array
+ *
+ * @return array - the modified map
+ */
 function drawPathBetweenPoints($start, $end, $map) {
 
     // draw the vert:
@@ -108,10 +153,4 @@ function drawPathBetweenPoints($start, $end, $map) {
     }
 
     return $map;
-}
-
-function printArray ($arr) {
-    foreach ($arr as $line) {
-        echo implode("", $line);
-    }
 }
